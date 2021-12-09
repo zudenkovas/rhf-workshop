@@ -13,7 +13,7 @@ export const TextInputField = ({
   id,
   control,
 }: TextInputFieldProps) => {
-  const { errors } = useFormState({ control });
+  const { errors } = useFormState({ control, name, exact: true });
   console.log("🚀 ~ file: TextInputField.tsx ~ line 17 ~ errors", errors);
 
   return (

@@ -1,12 +1,32 @@
 import Select, { Props as SelectProps } from "react-select";
-import { useController, Control } from "react-hook-form";
+import { Control, Controller } from "react-hook-form";
 
 type SelectFieldProps = Omit<SelectProps, "name"> & {
   control: Control;
   name: string;
 };
 
-export const SelectField = ({ name, control, ...rest }: SelectFieldProps) => {
-  const { field } = useController({ name, control, defaultValue: "" });
-  return <Select {...field} {...rest} />;
+export const SelectField = ({
+  name,
+  control,
+  options,
+  ...rest
+}: SelectFieldProps) => {
+  return (
+    <Controller
+      control={control}
+      name={name}
+      render={({ field: { onChange, value, ...restField } }) => (
+        <Select
+          {...restField}
+          {...rest}
+          onChange={(option: any) => {
+            onChange(option.value);
+          }}
+          value={options?.find((o: any) => o?.value === value)}
+          options={options}
+        />
+      )}
+    />
+  );
 };

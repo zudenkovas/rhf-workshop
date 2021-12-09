@@ -37,6 +37,8 @@ const formValidator =
 function App() {
   const { handleSubmit, control, formState } = useForm({
     resolver: formValidator(validationRules),
+    reValidateMode: "onBlur",
+    mode: "onBlur",
   });
 
   const onSubmit = (values: any) => {
@@ -47,10 +49,14 @@ function App() {
     );
   };
 
+  const onError = (errors: any) => {
+    console.log(errors);
+  };
+
   return (
     <div className="formWrapper">
       <h1>React Hook Form</h1>
-      <Form onSubmit={handleSubmit(onSubmit)}>
+      <Form onSubmit={handleSubmit(onSubmit, onError)}>
         <div className="formFieldsWrapper">
           <div className="fieldGroup verticalAlign">
             <h2>Names:</h2>
@@ -97,16 +103,19 @@ function App() {
             <h2>Allergies:</h2>
             <CheckboxField
               id="allergies.milk"
+              control={control}
               name="allergies.milk"
               label="Milk"
             />
             <CheckboxField
               id="allergies.nuts"
+              control={control}
               name="allergies.nuts"
               label="Nuts"
             />
             <CheckboxField
               id="allergies.seafood"
+              control={control}
               name="allergies.seafood"
               label="Sea food"
             />
