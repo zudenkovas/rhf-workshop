@@ -24,7 +24,7 @@ export const TextInputField = ({
         {...control.register(name)}
         type="text"
       />
-      {errors?.[name] && <p className="error">{errors?.[name]}</p>}
+      {errors?.[name] && <p className="error">{errors?.[name].message}</p>}
     </>
   );
 };

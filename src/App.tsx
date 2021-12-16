@@ -1,5 +1,7 @@
 import { Form } from "./components/Form";
 import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 import { TextInputField } from "./components/TextInputField";
 import { RadioField } from "./components/RadioField";
 import { CheckboxField } from "./components/CheckboxField";
@@ -14,18 +16,43 @@ const selectOptions = [
   { value: "borsch", label: "Borsch" },
 ];
 
-const validationRules = {
-  firstName: "Required",
-  secondName: "Required",
+const isRequired = (value: any) => {
+  return value ? "" : "Required";
 };
 
+const atLeastOneSelected = (value: any) => {
+  return Object.values(value).some((value) => value)
+    ? ""
+    : "At least one must be selected";
+};
+
+const atLeastOneSelectedWithYupSchema = yup
+  .object()
+  .test("allergies", "At least one must be selected", (values) => {
+    return Object.values(values).some((value) => value) ? true : false;
+  });
+
+const validationRules = {
+  firstName: isRequired,
+  secondName: isRequired,
+  allergies: yupResolver(atLeastOneSelectedWithYupSchema),
+};
+
+const yupSchema = yup.object().shape({
+  firstName: yup.string().required(),
+  secondName: yup.string().required(),
+});
+
 const formValidator =
-  (rules: Record<string, string>) => (values: Record<string, any>) => {
+  (rules: Record<string, (value: any) => string>) =>
+  (values: Record<string, any>) => {
     const errors = {} as Record<string, string>;
 
-    Object.entries(rules).forEach(([key, value]) => {
-      if (!values[key]) {
-        errors[key] = value;
+    Object.entries(rules).forEach(([key, rule]) => {
+      const error = rule(values[key]);
+
+      if (error) {
+        errors[key] = error;
       }
     });
 
@@ -36,7 +63,7 @@ const formValidator =
 
 function App() {
   const { handleSubmit, control, formState } = useForm({
-    resolver: formValidator(validationRules),
+    resolver: yupResolver(yupSchema),
     reValidateMode: "onBlur",
     mode: "onBlur",
   });
@@ -119,6 +146,9 @@ function App() {
               name="allergies.seafood"
               label="Sea food"
             />
+            {formState.errors?.allergies && (
+              <p className="error">{formState.errors?.allergies}</p>
+            )}
           </div>
 
           <div className="fieldGroup">
